@@ -9,3 +9,8 @@ markdown
 beautifulsoup4
 asgiref
 pyarrow
+Flask
+gunicorn
+pandas
+pyreadstat
+pyreadr

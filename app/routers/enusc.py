@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from app.db import SessionLocal
 from app.models.enusc import EnuscInteranual
 from app.schemas.enusc import EnuscOut
-from fastapi import APIRouter, Depends
 from fastapi.responses import Response, StreamingResponse   
 
 router = APIRouter(prefix="/v1/enusc", tags=["ENUSC"])
@@ -20,14 +19,19 @@ def get_db():
 @router.get("/")
 @router.get("") 
 def list_enusc(
-    skip:int=0, limit:int=100,
-    region:int|None=None, año:int|None=None,
-    human:int=0,                      # ← ***
-    db: Session = Depends(get_db)
+    skip: int = 0,
+    limit: int = 100,
+    region: int | None = None,
+    # Evitar identificadores unicode en Python; aceptar query 'año'
+    anio: int | None = Query(default=None, alias="año"),
+    human: int = 0,
+    db: Session = Depends(get_db),
 ):
     q = db.query(EnuscInteranual)
-    if region: q = q.filter(EnuscInteranual.region==region)
-    if año:    q = q.filter(EnuscInteranual.año==año)
+    if region:
+        q = q.filter(EnuscInteranual.region == region)
+    if anio:
+        q = q.filter(EnuscInteranual.año == anio)
     rows = q.offset(skip).limit(limit).all()
 
     if human:
@@ -38,7 +42,7 @@ def list_enusc(
 
 # app/routers/enusc.py  (nueva ruta)
 @router.get("/download/{fmt}")
-def dl(fmt:str, db: Session = Depends(get_db)):
+def dl(fmt: str, db: Session = Depends(get_db)):
     import pandas as pd, io, pyreadstat
     df = pd.read_sql("SELECT * FROM enusc_interanual LIMIT 50000", db.bind)
     if fmt=="csv":
@@ -54,5 +58,4 @@ def dl(fmt:str, db: Session = Depends(get_db)):
     buf.seek(0)
     return StreamingResponse(buf, media_type=mime,
         headers={"Content-Disposition":f"attachment;filename=enusc.{fmt}"})
-
 

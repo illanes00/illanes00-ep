@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Docs | EP Datos{% endblock %}
+{% block content %}
+<h2>Documentación</h2>
+<ul>
+  {% for f in files %}
+    <li><a href="{{ url_for('docs_page', name=f) }}">{{ f }}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

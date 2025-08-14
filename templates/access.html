@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Accesos extra{% endblock %}
+{% block content %}
+<h2>Usuarios externos habilitados</h2>
+<form method="post" style="margin-bottom:1rem">
+  <input name="email" placeholder="ricardo.lagos@gob.cl" required>
+  <button class="btn-explorar">Añadir</button>
+</form>
+<ul>
+  {% for u in wl %}
+    <li>{{ u.email }}</li>
+  {% endfor %}
+</ul>
+{% endblock %}

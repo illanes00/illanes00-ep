@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Env & secrets
+.env
+.env.*
+
+# Build/dist
+dist/
+build/
+
+# Data/large
+data/
+analysis/data/
+tools/data/
+app/tools/data/
+**/*.parquet
+**/*.csv
+**/*.tsv
+
+# Generated context dumps
+PROJECT_CONTEXT.txt
+

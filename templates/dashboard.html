@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:1.25rem">Dashboard</h2>
+
+<div class="stats-container">
+  <div class="stat-card"><h3>Total ENUSC</h3><p>{{ kpi.enusc }}</p></div>
+  <div class="stat-card"><h3>Total posts</h3><p>{{ kpi.posts }}</p></div>
+  <div class="stat-card"><h3>Datasets</h3><p>{{ kpi.datasets }}</p></div>
+  <div class="stat-card"><h3>Uptime</h3><p>{{ kpi.uptime }}</p></div>
+  <div class="stat-card"><h3>Comentarios</h3><p>{{ kpi.comments }}</p></div>
+<div class="stat-card"><h3>Proyectos</h3><p>{{ kpi.projects_open }}/{{ kpi.projects_total }}</p></div>
+
+</div>
+
+<h3 style="margin:1.5rem 0 .75rem">Víctimas por año</h3>
+<div id="chart" style="width:100%;height:400px"></div>
+<h3 style="margin:2rem 0 .75rem">Posts por mes</h3>
+<div id="chart-posts" style="width:100%;height:300px"></div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+<script>
+  Plotly.newPlot(
+    'chart',
+    [{
+        x: {{ chart_data["years"]|tojson }},
+        y: {{ chart_data["values"]|tojson }},
+      type:'bar',
+      marker:{color:'#00ACA0'}
+    }],
+    {margin:{t:10}, xaxis:{title:'Año'}, yaxis:{title:'Total RVI'}}
+  );
+  Plotly.newPlot(
+  'chart-posts',
+  [{
+     x: {{ chart_posts["months"]|tojson }},
+     y: {{ chart_posts["counts"]|tojson }},
+     type:'scatter'
+  }],
+  {margin:{t:10},xaxis:{title:'Mes'},yaxis:{title:'Entradas'}}
+);
+
+</script>
+{% endblock %}

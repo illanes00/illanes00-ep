@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Documentación{% endblock %}
+{% block content %}
+<ul class="nav-menu" id="doc-tabs">
+  {% for fn in files %}
+    <li><a href="#" data-file="{{ fn }}" class="{% if loop.first %}active{% endif %}">
+      {{ fn.replace('_',' ').split('.')[0] }}
+    </a></li>
+  {% endfor %}
+</ul>
+<article id="doc-body" class="markdown-content" style="padding-top:1rem"></article>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+const body = document.getElementById('doc-body');
+function load(f){
+  fetch(`/docs/raw/${f}`).then(r=>r.text())
+    .then(md=>{body.innerHTML = marked.parse(md);});
+}
+document.querySelectorAll('#doc-tabs a').forEach(a=>{
+  a.onclick=e=>{
+    e.preventDefault();
+    document.querySelector('#doc-tabs a.active')?.classList.remove('active');
+    a.classList.add('active');
+    load(a.dataset.file);
+  };
+});
+load("{{ files[0] }}");           // primera pestaña
+</script>
+{% endblock %}

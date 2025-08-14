@@ -1,0 +1,11 @@
+fastapi
+starlette
+uvicorn
+authlib
+python-dotenv
+SQLAlchemy
+alembic
+markdown
+beautifulsoup4
+asgiref
+pyarrow

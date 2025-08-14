@@ -1,0 +1,32 @@
+from sqlalchemy import Column, Integer, String, Float, BigInteger
+from app.db import Base
+
+class EnuscInteranual(Base):
+    __tablename__ = "enusc_interanual"
+    id_unico = Column(BigInteger, primary_key=True, index=True)
+    idr       = Column(BigInteger, index=True)
+    region    = Column(Integer, index=True)
+    region16  = Column(Integer, nullable=True)
+    sexo      = Column(Integer)
+    edad      = Column(Integer)
+    pad       = Column(Integer)
+    padb      = Column(Integer)
+    ped       = Column(Integer)
+    rvi       = Column(Integer)
+    rps       = Column(Integer)
+    rfv       = Column(Integer)
+    hur       = Column(Integer)
+    les       = Column(Integer)
+    prop_vehiculos = Column(Integer)
+    rdv       = Column(Integer)
+    rddv      = Column(Integer)
+    va_dc     = Column(Integer)
+    vp_dc     = Column(Integer)
+    rva_dc    = Column(Integer)
+    fact_pers_2008_2019 = Column(Float)
+    fact_hog_2008_2019  = Column(Float)
+    varstrat  = Column(BigInteger)
+    conglomerado = Column(BigInteger)
+    año       = Column(Integer)
+    fact_pers_2019_2022 = Column(Float)
+    fact_hog_2019_2022  = Column(Float)

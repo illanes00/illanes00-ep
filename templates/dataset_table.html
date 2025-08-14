@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}{{ ds_name }}{% endblock %}
+
+{% block content %}
+<h2>{{ ds_name }}</h2>
+
+<table id="tbl" class="data-table" style="width:100%"></table>
+
+<div style="margin:1rem 0">
+  Descargar:
+  <a href="/v1/enusc/download/csv">CSV</a> |
+  <a href="/v1/enusc/download/excel">Excel</a> |
+  <a href="/v1/enusc/download/stata">Stata</a> |
+  <a href="/v1/enusc/download/rdata">RData</a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+
+<!-- DataTables + extensiones (jQuery ya está en base.html) -->
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/2.0.7/css/jquery.dataTables.min.css">
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/buttons/3.0.0/css/buttons.dataTables.min.css">
+
+<script src="https://cdn.datatables.net/2.0.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.0/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/3.0.0/js/buttons.colVis.min.js"></script>
+
+
+<script>
+fetch("{{ api_url }}?limit=1000&human=1")   // ← URL recibida desde la vista
+  .then(r => r.json())
+  .then(data => {
+      const cols = Object.keys(data[0]).map(k => ({title:k, data:k}));
+      $('#tbl').DataTable({
+          data,
+          columns: cols,
+          pageLength: 25,
+          dom: 'Bfrtip',
+          buttons: ['csv','excel','colvis','pageLength'],
+           language:{url:'https://cdn.datatables.net/plug-ins/2.0.7/i18n/es-ES.json'}
+
+      });
+  });
+</script>
+{% endblock %}

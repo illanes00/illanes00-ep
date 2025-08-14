@@ -1,0 +1,274 @@
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Genera un libro de variables/códigos completo para ENUSC (2008–2024).
+Lee directamente los .sav (pyreadstat) para extraer:
+- variable → etiqueta
+- códigos → etiquetas
+- años de disponibilidad
+- heurísticas de unidad de análisis y rol
+
+Además incorpora metadatos de diseño muestral y pesos por año para análisis con ponderadores.
+
+Salida:
+- data/codebook_enusc.json      (estructura JSON consumible por el frontend)
+- data/codebook_enusc.xlsx      (sheets "variables" y "categorias")
+
+Uso (desde la raíz del proyecto):
+    python -m app.tools.build_enusc_codebook
+o:
+    python build_enusc_codebook.py
+"""
+from __future__ import annotations
+import os, re, json
+from pathlib import Path
+from collections import defaultdict, Counter
+
+import pandas as pd
+import pyreadstat
+
+ROOT = Path(__file__).resolve().parent
+# Intenta detectar si fue copiado dentro del repo (app/tools/) o se ejecuta suelto.
+# Asumimos data/ está dos niveles arriba si está en app/tools/
+if (ROOT / "../../data").exists():
+    DATA = (ROOT / "../../data").resolve()
+else:
+    DATA = (ROOT / "data").resolve()
+
+RAW_ENUSC = DATA / "raw" / "ENUSC"
+OUT_JSON  = DATA / "codebook_enusc.json"
+OUT_XLSX  = DATA / "codebook_enusc.xlsx"
+
+# ------------------ Metadatos globales por año ------------------
+
+WEIGHTS_BY_YEAR = {
+    # años históricos (interanual)
+    **{y: {"persona": "fact_pers_2008_2019", "hogar": "fact_hog_2008_2019",
+           "estrato": "varstrat", "conglomerado": "conglomerado"} for y in range(2008, 2019)},
+    **{y: {"persona": "fact_pers_2019_2022", "hogar": "fact_hog_2019_2022",
+           "estrato": "varstrat", "conglomerado": "conglomerado"} for y in range(2019, 2023)},
+    # ENUSC anuales recientes (ajusta nombres exactos según diccionario del año)
+    2023: {"persona": "Fact_Pers_Reg", "hogar": "Fact_Hog_Reg", "estrato": "VarStrat", "conglomerado": "Conglomerado"},
+    2024: {"persona": "Fact_Pers_Reg", "hogar": "Fact_Hog_Reg", "estrato": "VarStrat", "conglomerado": "Conglomerado"},
+}
+
+# universos/roles por heurística de nombre de variable
+ROLE_HINTS = {
+    # dependientes clave
+    "VA_DC": {"rol":"dependiente","unidad":"Hogar","tipo":"binaria","modulo":"Victimización (hogar)"},
+    "VP_DC": {"rol":"dependiente","unidad":"Persona","tipo":"binaria","modulo":"Victimización (persona)"},
+    "RVI":   {"rol":"dependiente","unidad":"Persona","tipo":"binaria","modulo":"Victimización (persona)"},
+    "RPS":   {"rol":"dependiente","unidad":"Persona","tipo":"binaria","modulo":"Victimización (persona)"},
+    "RFV":   {"rol":"dependiente","unidad":"Persona","tipo":"binaria","modulo":"Victimización (persona)"},
+    "HUR":   {"rol":"dependiente","unidad":"Hogar","tipo":"binaria","modulo":"Victimización (hogar)"},
+    "LES":   {"rol":"dependiente","unidad":"Persona","tipo":"binaria","modulo":"Victimización (persona)"},
+    "RVA_DC":{"rol":"dependiente","unidad":"Hogar","tipo":"binaria","modulo":"Victimización (hogar)"},
+    # controles comunes
+    "SEXO": {"rol":"independiente","unidad":"Persona","tipo":"categórica"},
+    "EDAD": {"rol":"independiente","unidad":"Persona","tipo":"categórica ordinal"},
+    "REGION":{"rol":"clave geográfica","unidad":"Hogar","tipo":"categórica"},
+    "REGION16":{"rol":"clave geográfica","unidad":"Hogar","tipo":"categórica"},
+    "KISH": {"rol":"filtro","unidad":"Persona","tipo":"binaria","nota":"Filtrar Kish==1 para módulo central"},
+}
+
+# mapeos de nombres comunes a mayúsculas para coincidir mejor entre años
+CANON = {
+    "año":"ANIO",
+    "anio":"ANIO",
+    "year":"ANIO",
+    "sexo":"SEXO",
+    "edad":"EDAD",
+    "region":"REGION",
+    "region16":"REGION16",
+    "kish":"KISH",
+    "varstrat":"VARSTRAT",
+    "conglomerado":"CONGLOMERADO",
+    "va_dc":"VA_DC",
+    "vp_dc":"VP_DC",
+    "rvi":"RVI",
+    "rps":"RPS",
+    "rfv":"RFV",
+    "hur":"HUR",
+    "les":"LES",
+    "rva_dc":"RVA_DC",
+}
+
+def canonize(var: str) -> str:
+    v = var.strip()
+    v_up = v.upper()
+    return CANON.get(v.lower(), v_up)
+
+def guess_unit(name: str) -> str|None:
+    n = name.upper()
+    if n in {"VA_DC","RVA_DC","HUR"}: return "Hogar"
+    if n in {"VP_DC","RVI","RPS","RFV","LES"}: return "Persona"
+    if n.startswith("RPH_"): return "Persona"
+    if n in {"REGION","REGION16"}: return "Hogar"
+    return None
+
+def guess_role(name: str) -> str|None:
+    if name.upper() in {"VA_DC","VP_DC","RVI","RPS","RFV","LES","HUR","RVA_DC"}:
+        return "dependiente"
+    if name.upper() in {"SEXO","EDAD","REGION","REGION16"} or name.upper().startswith("RPH_"):
+        return "independiente"
+    if name.upper()=="KISH": return "filtro"
+    return None
+
+def guess_scale(name: str, values: dict[int,str]|None) -> str|None:
+    if values is None: return None
+    codes = sorted(values.keys())
+    if set(codes).issubset({0,1}): return "binaria"
+    # si están 1..k y parecen ordenadas
+    if codes and min(codes)==1 and len(set(codes))==max(codes):
+        # revisa palabras clave para ordinal
+        joined = " ".join(values[c] for c in codes if isinstance(c,int))
+        if any(w in joined.lower() for w in ["menos","más","mayor","menor","alta","baja","siempre","nunca"]):
+            return "categórica ordinal"
+        return "categórica nominal"
+    return "categórica nominal"
+
+def find_sav_files() -> dict[int, Path]:
+    pats = [
+        "base-usuario-19-enusc-2022*.sav",
+        "base-usuario-20-enusc-2023*.sav",
+        "base-de-datos---enusc-2024*.sav",
+        "base-usuario-18-enusc-2021*.sav",
+        "base-usuario-17-enusc-2020*.sav",
+        "base-de-datos---xvi-enusc-2019*.sav",
+        "base-de-datos---xv-enusc-2018*.sav",
+        # históricos 2008-2014 (nombres variables):
+        "1. ENUSC V Base de Usuario 2008.sav",
+        "2. ENUSC VI Base Usuario 2009.sav",
+        "3. ENUSC VII Base Usuario 2010.sav",
+        "4. ENUSC VIII Base Usuario 2011.sav",
+        "5. ENUSC IX  Base Usuario 2012.sav",
+        "6. ENUSC X Base Usuario 2013.sav",
+        "7. ENUSC XI Base Usuario 2014.sav",
+        "8. ENUSC XII Base Usuario 2015.sav",
+    ]
+    out = {}
+    for p in RAW_ENUSC.glob("*.sav"):
+        # intenta inferir el año si está en el nombre
+        m = re.search(r"(20\d{2})", p.name)
+        if m:
+            out[int(m.group(1))] = p
+    # complementa con patrones fijos
+    for pat in pats:
+        for p in RAW_ENUSC.glob(pat):
+            m = re.search(r"(20\d{2})", p.name)
+            if m:
+                out[int(m.group(1))] = p
+    return dict(sorted(out.items()))
+
+def read_labels(sav_path: Path):
+    # Lee solo metadata para ser rápido
+    df, meta = pyreadstat.read_sav(str(sav_path), apply_value_formats=False)
+    # NOTA: algunos pyreadstat antiguos no soportan metadata only de forma estable en todos los .sav
+    var_labels = meta.variable_to_label or {}
+    val_labels = meta.value_labels or {}
+    # value_labels: dict(name -> dict(code->label)) en SPSS pueden venir como "valuelabels" por conjunto
+    # pyreadstat ya separa por variable cuando los valuelabels están asignados a cada variable
+    return list(df.columns), var_labels, val_labels
+
+def main():
+    RAW_ENUSC.mkdir(parents=True, exist_ok=True)
+    files = find_sav_files()
+    if not files:
+        raise SystemExit(f"[ERROR] No encontré .sav en {RAW_ENUSC}")
+
+    # recolectores
+    years_by_var = defaultdict(set)
+    label_by_var = {}
+    values_by_var = defaultdict(dict)
+
+    for year, path in files.items():
+        print(f"[INFO] {year} -> {path.name}")
+        cols, varlabels, vallabels = read_labels(path)
+
+        for v in cols:
+            vc = canonize(v)
+            years_by_var[vc].add(year)
+            # etiqueta
+            lab = varlabels.get(v) or varlabels.get(vc) or ""
+            if vc not in label_by_var or (label_by_var[vc]=="" and lab):
+                label_by_var[vc] = lab
+            # valores
+            # pyreadstat entrega val_labels mapeadas por nombre original; probamos v y vc
+            vals = vallabels.get(v) or vallabels.get(vc) or None
+            if isinstance(vals, dict):
+                # guarda todos los códigos vistos a lo largo de los años (no sobreescribe)
+                for k, txt in vals.items():
+                    if k not in values_by_var[vc]:
+                        values_by_var[vc][k] = txt
+
+    # construir filas del codebook
+    rows = []
+    cats_rows = []
+    for v, years in sorted(years_by_var.items(), key=lambda kv: kv[0]):
+        label = label_by_var.get(v, "")
+        values = values_by_var.get(v) or None
+
+        role = ROLE_HINTS.get(v, {}).get("rol") or guess_role(v) or ""
+        unidad = ROLE_HINTS.get(v, {}).get("unidad") or guess_unit(v) or ""
+        tipo = ROLE_HINTS.get(v, {}).get("tipo") or guess_scale(v, values) or ""
+
+        # pesos recomendados por año (según unidad)
+        pesos = {}
+        for y in sorted(years):
+            w = WEIGHTS_BY_YEAR.get(y, {})
+            if unidad == "Persona":
+                pesos[str(y)] = {"peso": w.get("persona"), "estrato": w.get("estrato"), "conglomerado": w.get("conglomerado")}
+            elif unidad == "Hogar":
+                pesos[str(y)] = {"peso": w.get("hogar"), "estrato": w.get("estrato"), "conglomerado": w.get("conglomerado")}
+            else:
+                # si no sabemos la unidad, devolvemos ambos por referencia
+                pesos[str(y)] = {"peso_persona": w.get("persona"), "peso_hogar": w.get("hogar"), "estrato": w.get("estrato"), "conglomerado": w.get("conglomerado")}
+
+        # marcar códigos perdidos comunes
+        miss_keys = [k for k in (85,88,96,98,99) if values and k in values]
+        codigos_perdidos = miss_keys or None
+
+        row = {
+            "var": v,
+            "etiqueta": label,
+            "unidad_analisis": unidad or None,
+            "rol_sugerido": role or None,
+            "tipo_escala": tipo or None,
+            "years": sorted(list(years)),
+            "peso_recomendado_por_anio": pesos,
+            "codigos_perdidos": codigos_perdidos,
+            "categorias": None,  # va aparte en hoja categorias; aquí dejamos copia opcional para la UI
+        }
+        if values:
+            # también guardamos aquí para facilitar al frontend
+            row["categorias"] = [{"codigo": (int(k) if isinstance(k,(int,float)) and float(k).is_integer() else k),
+                                  "etiqueta": str(vl)} for k, vl in sorted(values.items(), key=lambda kv: (isinstance(kv[0], str), kv[0]))]
+
+            # y sheet "categorias" separado
+            for k, vl in sorted(values.items(), key=lambda kv: (isinstance(kv[0], str), kv[0])):
+                cats_rows.append({"variable": v, "codigo": (int(k) if isinstance(k,(int,float)) and float(k).is_integer() else k), "etiqueta": str(vl)})
+
+        rows.append(row)
+
+    # ---------- salida JSON y Excel ----------
+    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUT_JSON, "w", encoding="utf-8") as f:
+        json.dump({"dataset":"ENUSC","version":"1.0","generated_by":"build_enusc_codebook.py",
+                   "rows": rows}, f, ensure_ascii=False, indent=2)
+
+    # Excel:
+    df_vars = pd.DataFrame(rows)
+    df_cats = pd.DataFrame(cats_rows) if cats_rows else pd.DataFrame(columns=["variable","codigo","etiqueta"])
+    with pd.ExcelWriter(OUT_XLSX, engine="xlsxwriter") as xw:
+        # columnas más legibles en 'variables'
+        vcols = ["var","etiqueta","unidad_analisis","rol_sugerido","tipo_escala","years","codigos_perdidos","peso_recomendado_por_anio"]
+        df_vars[vcols].to_excel(xw, sheet_name="variables", index=False)
+        df_cats.to_excel(xw, sheet_name="categorias", index=False)
+
+    print(f"[OK] JSON  → {OUT_JSON}")
+    print(f"[OK] Excel → {OUT_XLSX}")
+
+if __name__ == "__main__":
+    main()

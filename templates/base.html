@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{% block title %}Espacio Público – Portal de Datos{% endblock %}</title>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.png') }}">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='ep.css') }}">
+
+  <!-- jQuery (necesario para DataTables v1.x y tus plugins) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- --- HEADER / NAVBAR --- -->
+  <header>
+    <div class="container nav">
+      <a class="logo" href="{{ url_for('home') }}">Espacio Público – Portal de Datos</a>
+      <ul class="nav-menu">
+        <li><a href="{{ url_for('home') }}">Inicio</a></li>
+        <li><a href="{{ url_for('datasets') }}">Datasets</a></li>
+        <li><a href="{{ url_for('api_docs') }}">API</a></li>
+        <li><a href="{{ url_for('docs') }}">Docs</a></li>
+        <li><a href="{{ url_for('explorer.viz_view') }}">Vis</a></li>
+        <li><a href="{{ url_for('dashboard') }}">Dashboard</a></li>
+        <li><a href="{{ url_for('blog_list') }}">Blog</a></li>
+        {% if request.path.startswith('/dashboard') %}
+  <li><a href="{{ url_for('access') }}">Accesos</a></li>
+{% endif %}
+
+
+        <!-- login / logout chip -->
+        <li id="google-chip"></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- --- CONTENIDO --- -->
+  <main class="container" style="padding:2rem 0">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- --- FOOTER --- -->
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <h4>Contacto</h4>
+        <ul>
+          <li>Email: <a href="mailto:martin.illanes@espaciopublico.cl">martin.illanes@espaciopublico.cl</a></li>
+          <li>Dirección: Orrego Luco 087, Piso 3, Providencia</li>
+        </ul>
+      </div>
+      <div>
+        <h4>Enlaces</h4>
+        <ul>
+          <li><a href="https://espaciopublico.cl" target="_blank">Espacio Público</a></li>
+          <li><a href="https://ep.illanes00.cl">EP Datos</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#" id="btn-licencia">Licencia de Datos</a></li>
+          <li><a href="#" id="btn-privacidad">Política de Privacidad</a></li>
+          <li><a href="#" id="btn-terminos">Términos de Uso</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2025 Espacio Público. Todos los derechos reservados.</div>
+  </footer>
+
+  <!-- scripts comunes -->
+  <script src="{{ url_for('static', filename='main.js') }}"></script>
+
+  <!-- login chip – usa /auth/user -->
+  <script>
+  {% raw %}
+  document.addEventListener("DOMContentLoaded", ()=>{
+    fetch("/auth/user").then(r=>r.json()).then(u=>{
+      const el = document.getElementById("google-chip");
+      if (!u.email){
+        el.innerHTML = `<a href="/auth/login">
+          <img src="https://developers.google.com/identity/images/g-logo.png" style="height:20px"> Ingresar
+        </a>`;
+      }else{
+        el.innerHTML = `
+          <div class="chip">
+            <img src="${u.picture}" alt="pfp">${u.email.split("@")[0]}
+            <a href="/logout" style="color:var(--turquesa)" title="Salir">⏻</a>
+          </div>`;
+      }
+    });
+  });
+  {% endraw %}
+  </script>
+
+  <!-- modal licencia -->
+  <style>
+    .chip{display:inline-flex;align-items:center;gap:.4rem;background:#fff;padding:.2rem .6rem;border-radius:20px;color:#333}
+    .chip img{border-radius:50%;height:24px}
+    .chip a{margin-left:.4rem;color:var(--púrpura);font-weight:700}
+ 
+                .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center}
+                .modal-box{background:#fff;padding:2rem;border-radius:var(--radio);max-width:600px}
+                .modal-box h3{margin-top:0;color:var(--turquesa)}
+  </style>
+  {% for mdl in ["licencia","privacidad","terminos"] %}
+  <div id="modal-{{ mdl }}" class="modal">
+    <div class="modal-box">
+      {% if mdl=="licencia" %}
+        <h3>Licencia de Datos (CC-BY 4.0)</h3>
+        <p>Salvo que se indique lo contrario, todos los datasets publicados pueden reutilizarse citando a Espacio Público.</p>
+      {% elif mdl=="privacidad" %}
+        <h3>Política de Privacidad</h3>
+        <p>No almacenamos datos personales fuera de la autenticación de Google Workspace …</p>
+      {% else %}
+        <h3>Términos de Uso</h3>
+        <p>Este portal se entrega “tal cual”, sin garantías. El uso indebido de los datos es responsabilidad del usuario.</p>
+      {% endif %}
+      <button onclick="this.closest('.modal').style.display='none'" class="btn-explorar">Cerrar</button>
+    </div>
+  </div>
+  {% endfor %}
+  <script>
+  ["licencia","privacidad","terminos"].forEach(id=>{
+    document.getElementById("btn-"+id)?.addEventListener("click",
+      ()=>document.getElementById("modal-"+id).style.display="flex");
+  });
+  </script>
+  
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

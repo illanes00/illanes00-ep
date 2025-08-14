@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Datasets | EP Datos{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:1rem">Datasets disponibles</h2>
+<div style="display:flex;gap:.5rem;margin-bottom:1rem">
+   <a href="/docs#publicar-dataset" class="btn-explorar">➕ Añadir dataset</a>
+   <a href="/datasets/upload"       class="btn-explorar">📤 Subir CSV</a>
+ </div>
+ 
+
+<div class="card-blog" style="position:relative;padding-bottom:3rem">
+  <h3>ENUSC Interanual</h3>
+  <p>Encuesta Nacional de Seguridad Ciudadana (2005-2023).</p>
+    <p style="margin-top:1rem">
+       <a href="{{ url_for('dataset_view', ds='enusc') }}"
+          class="btn-explorar" style="position:absolute;bottom:1rem;right:1rem">
+          Ver tabla →
+       </a>      </p>             </div>
+{# aquí podrás ir sumando más datasets #}
+{% endblock %}

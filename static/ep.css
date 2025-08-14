@@ -1,0 +1,340 @@
+/* static/ep.css */
+
+/* Reset mínimo */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  background-color: #F9F9F9;
+  color: #2B2D42;
+  line-height: 1.6;
+}
+
+a { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* Paleta de Espacio Público */
+:root {
+  --naranja: #EAAA00;
+  --turquesa: #00ACA0;
+  --púrpura: #6A3F95;
+  --blanco: #FFFFFF;
+  --texto: #2B2D42;
+  --radio: 8px;
+  --sombra: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+/* Contenedor central */
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+header {
+  background-color: var(--turquesa);
+  color: var(--blanco);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--blanco);
+}
+.nav-menu {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+}
+.nav-menu li a {
+  font-weight: 500;
+  color: var(--blanco);
+  transition: color 0.2s;
+}
+.nav-menu li a:hover {
+  color: var(--naranja);
+}
+
+/* Hero */
+.hero {
+  background: linear-gradient(135deg, var(--turquesa) 0%, var(--púrpura) 100%);
+  color: var(--blanco);
+  text-align: center;
+  padding: 4rem 1rem;
+}
+.hero h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+.hero p {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+.btn-explorar {
+  background-color: var(--naranja);
+  color: var(--blanco);
+  padding: 0.75rem 2rem;
+  border-radius: var(--radio);
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+.btn-explorar:hover {
+  background-color: #cc8f00;
+}
+
+/* Sección Funcionalidades */
+.features {
+  padding: 3rem 0;
+  background-color: var(--blanco);
+}
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+.card {
+  background-color: var(--blanco);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 1.5rem;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+}
+.card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: var(--turquesa);
+}
+.card p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Footer */
+footer {
+  background-color: var(--púrpura);
+  color: var(--blanco);
+  padding: 2rem 0;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+.footer-section h4 {
+  font-size: 1.125rem;
+  margin-bottom: 0.75rem;
+}
+.footer-section ul {
+  list-style: none;
+}
+.footer-section li {
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+.footer-bottom {
+  text-align: center;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 1rem; }
+}
+
+/* Tabla de datos estilo ENUSC */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    box-shadow: var(--sombra);
+    border-radius: var(--radio);
+    overflow: hidden;
+    background: var(--blanco);
+  }
+  .data-table th,
+  .data-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+  }
+  .data-table thead {
+    background-color: var(--turquesa);
+    color: var(--blanco);
+    font-weight: 600;
+  }
+  .data-table tbody tr:nth-child(even) {
+    background-color: #f1f1f1;
+  }
+  .data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+  
+  /* Dashboard — bloque de estadísticas */
+.stats-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    flex: 1;
+    min-width: 180px;
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding: 1.5rem;
+    text-align: center;
+  }
+  .stat-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--turquesa);
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .stat-card p {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  /* ----  Blog cards  ---- */
+.card-blog{
+    background: var(--blanco);
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    padding:1.25rem;
+    margin-bottom:1rem;
+  }
+  .card-blog h3{margin:0 0 .5rem;color:var(black)}
+  .card-blog p.meta{font-size:.85rem;opacity:.7;margin-bottom:.75rem}
+  .card-blog a.more{color:var(--turquesa);font-weight:600}
+  
+  .sidebar{
+    position:sticky;top:6rem;
+  }
+  .sidebar ul{list-style:none;padding-left:0}
+  .sidebar li{margin:.35rem 0}
+  .sidebar a{color:var(--turquesa)}
+  .sidebar a.active{font-weight:700;text-decoration:underline}
+  
+  /* TOC indent */
+  .toc-level-3{margin-left:1rem}
+  
+  /* Likes */
+  .btn-like{background:none;border:none;font-size:1.1rem;cursor:pointer}
+  .btn-like.liked{color:red}
+  
+  /* títulos pegados al borde */
+.month-header{
+    margin:1.5rem 0 .75rem 0;
+    color:var(--turquesa);
+  }
+  
+  .card-blog{ padding:1.5rem }          /* un poco más aire */
+  
+  .card-blog h3{ margin-top:0 }         /* evita doble margen */
+  
+  .meta{ margin-bottom:.75rem }         /* aire bajo meta */
+  
+  .btn-explorar{ text-decoration:none } /* botones link sin subrayar */
+  
+/* --- Blog / meta --- */
+.card-blog h3{margin:0 0 .25rem;color:var(--negro)}
+.meta b{font-weight:700;color:var(--púrpura)}
+.month-header{margin:2rem 0 .75rem;color:var(--turquesa)}
+
+/* botones mini */
+.btn-sm{padding:.3rem .9rem;font-size:.8rem;border-radius:var(--radio);border:none;cursor:pointer}
+.btn-sm.edit{background:var(--naranja);color:#fff}
+.btn-sm.delete{background:#ddd;color:#333}
+
+/* sidebar pegado + scroll */
+.sidebar{position:sticky;top:6rem;max-height:calc(100vh - 7rem);overflow:auto}
+
+/* EasyMDE icon color */
+.editor-toolbar button{color:#222}
+
+/* DataTables */
+table.dataTable thead th,
+table.dataTable tbody td{
+  font-size: .9rem;
+}
+.dataTables_wrapper .dt-buttons .dt-button{
+  background: var(--turquesa);
+  color:#fff;
+  border:none;
+  border-radius:var(--radio);
+  padding:.35rem .9rem;
+  margin-right:.25rem;
+}
+.dataTables_length select,
+.dataTables_filter input{
+  border:1px solid #ccc;
+  border-radius:4px;
+  padding:.15rem .35rem;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3{margin:1rem 0 .5rem}
+
+/* — pestañas documentación — */
+#doc-tabs {margin-bottom:1rem; gap:.5rem}
+#doc-tabs a {padding:.4rem .9rem; border-radius:var(--radio); background:#eee}
+#doc-tabs a.active{background:var(--turquesa);color:#fff}
+#doc-body h1,h2,h3{margin-top:1.2rem}
+
+
+  /* —— Markdown mejorado —— */
+  .markdown-content p{
+    line-height:2;                  /* ✔ interlineado */
+    margin:0 0 2rem;                 /* ✔ espacio entre párrafos */
+  }
+  .markdown-content table{
+    width:100%;
+    border-collapse:collapse;
+    margin:1rem 0;
+    font-size:.9rem;
+    box-shadow:var(--sombra);
+  }
+  .markdown-content table th,
+  .markdown-content table td{
+    border:1px solid #ddd;
+    padding:.5rem .75rem;
+  }
+  .markdown-content table thead{
+    background:var(--turquesa);color:#fff
+  }
+
+
+      /* en static/ep.css (o un archivo global) */
+html,body{height:100%}
+body{display:flex;flex-direction:column}
+main{flex:1}            /* empuja el footer hacia abajo */

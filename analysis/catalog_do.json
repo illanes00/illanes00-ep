@@ -1,0 +1,326 @@
+[
+  {
+    "path": "analysis/old_scripts/SP Dipres_2.do",
+    "title": "GrÃ¡ficos evoluciÃ³n presupuestos SP Dipres",
+    "summary": "",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/SP Dipres.do",
+    "title": "GrÃ¡ficos evoluciÃ³n presupuestos SP Dipres",
+    "summary": "",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Update, Homicides trends, CEAD 2022 complete.do",
+    "title": "Update, Homicides trends, CEAD 2022 complete",
+    "summary": "This dofile plots homicides trends using data from CEAD.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/01 Cleaning Data, ENUSC 16-21.do",
+    "title": "01 Cleaning Data, ENUSC 16-21",
+    "summary": "This dofile sets the data to check different tendencies of the",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Homicides trends, Fiscal¡a.do",
+    "title": "01 Homicides trends, FiscalÃ­a",
+    "summary": "This dofile plots homicides trends using data from Fiscalia.",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Homicides trends, CEAD, Fiscal¡a y DEIS.do",
+    "title": "01 Homicides trends, CEAD, FiscalÃ­a y DEIS",
+    "summary": "This dofile plots homicides trends using data from CEAD and from",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/00 Master Do file, Informe 1.do",
+    "title": "00 Master Do file, Informe 1",
+    "summary": "This dofile prepares the data to plot each one of the Figures of",
+    "kind": "master"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Homicides trends, CEAD.do",
+    "title": "01 Homicides trends, CEAD",
+    "summary": "This dofile plots homicides trends using data from CEAD.",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Cleaning Data, ENUSC 08-15, incomplete.do",
+    "title": "01 Cleaning Data, ENUSC 08-15, incomplete",
+    "summary": "This dofile sets the data to check different tendencies of the",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Homicides trends, CEAD y Fiscal¡a.do",
+    "title": "01 Homicides trends, CEAD y FiscalÃ­a",
+    "summary": "This dofile plots homicides trends using data from CEAD and from",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 DMCS Cead y ENUSC.do",
+    "title": "01\tDMCS Cead y ENUSC",
+    "summary": "This dofile sets the data as survey data and plots the trends of",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Corr delta(perc-vict) - delta(homicides).do",
+    "title": "01 Corr delta(perc-vict) - delta(homicides)",
+    "summary": "This dofile plots the correlation between the delta of 2022 with",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Clean data, INE projections.do",
+    "title": "01 Clean data, INE projections",
+    "summary": "This dofile sets the population projections from INE for each region",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Cleaning Data, ENUSC 16-21.do",
+    "title": "01 Cleaning Data, ENUSC 16-21",
+    "summary": "This dofile sets the data to check different tendencies of the",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/02 Tendencias de las variables, ENUSC 16-21.do",
+    "title": "02 Tendencias de las variables",
+    "summary": "This dofile sets the data as survey data and plots the trends of",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Cleaning Data, ENUSC 08-21.do",
+    "title": "01 Trends Long Term, ENUSC 08-21",
+    "summary": "This dofile plots the trends of perception of delinquency,",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 DEIS.do",
+    "title": "01 Homicides trends, Minsal",
+    "summary": "This dofile plots gun shot deaths trends using data from Health",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 Theft trends, Fiscal¡a.do",
+    "title": "01 Theft trends, FiscalÃ­a",
+    "summary": "This dofile plots theft trends using data from Fiscalia.",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 1/01 How people inform, ENUSC 16-21.do",
+    "title": "01 How people inform, ENUSC",
+    "summary": "This dofile plots a bar graph woth how people inform using enusc",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 ENUSC Variables.do",
+    "title": "01 ENUSC Variables",
+    "summary": "This dofile uses ENUSC Database in order to plot the trends of",
+    "kind": "analysis"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning  Chile.do",
+    "title": "01\tLAPOP, Cleaning Chile",
+    "summary": "This dofile cleans Chilean LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Per£.do",
+    "title": "01\tLAPOP, Cleaning PerÃº",
+    "summary": "This dofile cleans PerÃº LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Elections LAC Comparison, multiple DB, Plots.do",
+    "title": "01\tElections LAC Comparison, multiple DB, Plots",
+    "summary": "This dofile plots Electoral institutions trust trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Congress trust, multiple DB, Plots.do",
+    "title": "01\tCongress trust, multiple DB, Plots",
+    "summary": "This dofile plots Congress trust trends using 3 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 Police performance, multiple DB, Plots.do",
+    "title": "02\tPolice performance, multiple DB, Plots",
+    "summary": "This dofile plots Police performance trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 LAPOP, Appending and plotting.do",
+    "title": "02\tLAPOP, Appending and plotting",
+    "summary": "This dofile appends each country LAPOP survey, saves a new DB,",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 Public Ministery performance, multiple DB, Plots.do",
+    "title": "02\tPublic Ministery performance, multiple DB, Plots",
+    "summary": "This dofile plots Public Ministery performance trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 Latinobarometer, Plots.do",
+    "title": "02\tLatinobarometer, Plots",
+    "summary": "This dofile uses latinobarometer data base to plot the relevant",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Brazil.do",
+    "title": "01\tLAPOP, Cleaning Brazil",
+    "summary": "This dofile cleans Brazil LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Police trust, multiple DB, Plots.do",
+    "title": "01\tPolice trust, multiple DB, Plots",
+    "summary": "This dofile plots Police trust trends using 4 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 WJP Index trends.do",
+    "title": "01\tWJP Index trends",
+    "summary": "This dofile plots institutional trust trends from 2015 til 2023,",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 Justice System performance, multiple DB, Plots.do",
+    "title": "02\tJustice System performance, multiple DB, Plots",
+    "summary": "This dofile plots Justice System performance trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Government trust, multiple DB, Plots.do",
+    "title": "01\tGovernment trust, multiple DB, Plots",
+    "summary": "This dofile plots Government trust trends using 3 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 CADEM Trust trends.do",
+    "title": "01\tCADEM Trust trends",
+    "summary": "This dofile plots institutional trust trends from 2015 til 2023,",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Congress LAC Comparison, multiple DB, Plots.do",
+    "title": "01\tCongress LAC Comparison, multiple DB, Plots",
+    "summary": "This dofile plots Congress trust trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Police LAC Comparison, multiple DB, Plots.do",
+    "title": "01\tPolice LAC Comparison, multiple DB, Plots",
+    "summary": "This dofile plots Police trust trends for LAC and CHL using 2",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Justice trust, multiple DB, Plots.do",
+    "title": "01\tJustice trust, multiple DB, Plots",
+    "summary": "This dofile plots Justice trust trends using 4 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Mexico.do",
+    "title": "01\tLAPOP, Cleaning Mexico",
+    "summary": "This dofile cleans Mexico LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Argentina.do",
+    "title": "01\tLAPOP, Cleaning Argentina",
+    "summary": "This dofile cleans Argentina LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Bolivia.do",
+    "title": "01\tLAPOP, Cleaning Bolivia",
+    "summary": "This dofile cleans PerÃº LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/02 Congress performance, multiple DB, Plots.do",
+    "title": "02\tCongress performance, multiple DB, Plots",
+    "summary": "This dofile plots Congress performance trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Ecuador.do",
+    "title": "01\tLAPOP, Cleaning Ecuador",
+    "summary": "This dofile cleans Ecuador LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Latinobarometer, Cleaning Data.do",
+    "title": "01\tLatinobarometer, Cleaning Data",
+    "summary": "This dofile cleans latinobarometer data bases",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Uruguay.do",
+    "title": "01\tLAPOP, Cleaning Uruguay",
+    "summary": "This dofile cleans Uruguay LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 Justice LAC Comparison, multiple DB, Plots.do",
+    "title": "01\tJustice LAC Comparison, multiple DB, Plots",
+    "summary": "This dofile plots Justice trust trends using 2 different data",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Colombia.do",
+    "title": "01\tLAPOP, Cleaning Colombia",
+    "summary": "This dofile cleans Colombia LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Venezuela.do",
+    "title": "01\tLAPOP, Cleaning Venezuela",
+    "summary": "This dofile cleans Venezuela LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 CEP Trust trends.do",
+    "title": "01\tCEP Trust trends",
+    "summary": "This dofile plots institutional trust trends from 2015 til 2023,",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/01 LAPOP, Cleaning Paraguay.do",
+    "title": "01\tLAPOP, Cleaning Paraguay",
+    "summary": "This dofile cleans Paraguay LAPOP survey from 2010 until 2021.",
+    "kind": "cleaning"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/Old Do's/05 Checking trends heterogeneity of Insecurity Sensation, ENUSC 16-21.do",
+    "title": "05 Checking trends heterogeneity of Insecurity Sensation, ENUSC 16-21",
+    "summary": "This dofile uses enusc_16_21 from use data to plot the trends",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/Old Do's/01 Checking trends heterogeneity of PAD, ENUSC 16-21.do",
+    "title": "01 Checking trends heterogeneity of PAD, ENUSC 16-21",
+    "summary": "This dofile uses enusc_16_21 from use data to plot the trends",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/Old Do's/03 Checking trends heterogeneity of Information sources, Municipality level, ENUSC 16-21.do",
+    "title": "03 Checking trends heterogeneity of Information sources, Municipality level, ENUSC 16-21",
+    "summary": "This dofile uses enusc_16_21 from use data to plot the trends",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/Old Do's/04 Checking trends heterogeneity of Future Victimization, ENUSC 16-21.do",
+    "title": "04 Checking trends heterogeneity of Future Victimization, ENUSC 16-21",
+    "summary": "This dofile uses enusc_16_21 from use data to plot the trends",
+    "kind": "plot"
+  },
+  {
+    "path": "analysis/old_scripts/Informe 2/Old Do's/02 Checking trends heterogeneity of Information sources, Country level, ENUSC 16-21.do",
+    "title": "02 Checking trends heterogeneity of Information sources, Country level, ENUSC 16-21",
+    "summary": "This dofile uses enusc_16_21 from use data to plot the trends",
+    "kind": "plot"
+  }
+]

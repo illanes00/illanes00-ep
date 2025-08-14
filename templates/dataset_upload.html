@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Subir dataset{% endblock %}
+{% block content %}
+<h2>Subir nuevo dataset</h2>
+<form method="post" enctype="multipart/form-data">
+  <label>Nombre interno
+    <input name="name" required>
+  </label><br><br>
+  <label>Archivo CSV
+    <input type="file" name="file" accept=".csv" required>
+  </label><br><br>
+  <button class="btn-explorar">Subir</button>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Codebook ENUSC{% endblock %}
+{% block content %}
+<h2>Diccionario de variables ENUSC</h2>
+<table class="data-table">
+  <thead><tr><th>Variable</th><th>Descripción</th></tr></thead>
+  <tbody>
+    {% for r in rows %}
+      <tr><td><code>{{ r.var }}</code></td><td>{{ r.etiqueta }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

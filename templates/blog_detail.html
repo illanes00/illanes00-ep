@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<div data-post-id="{{ post.id }}" style="display:flex;gap:2rem">
+  <!-- MAIN ARTICLE -->
+  <article style="flex:3">
+    <!-- meta -->
+    <h1>#{{ post.title }}
+      {% if post.tag %}<span style="font-size:.8rem;color:var(--turquesa)">
+        [{{ post.tag }}]</span>{% endif %}
+      </h1>
+      
+    <p class="meta">
+      <b>{{ post.author_email }}</b> ·
+      {{ post.created_at.strftime("%d %b %Y %H:%M") }}
+      · <span id="view-count">{{ post.views }}</span> vistas
+      · <button id="btn-like" data-post-id="{{ post.id }}" class="btn-like">❤️</button>
+        <span id="like-count">{{ post.likes }}</span>
+    </p>
+    <!-- contenido -->
+    <div class="markdown-content">{{ html|safe }}</div>
+    <hr style="margin:1.5rem 0">
+    <a href="{{ url_for('blog_form', post_id=post.id) }}" class="btn-sm edit">Editar</a>
+    <form action="{{ url_for('blog_delete', post_id=post.id) }}" method="post" style="display:inline">
+      <button class="btn-sm delete">Eliminar</button>
+    </form>
+    <!-- templates/blog_detail.html  (botón)-->
+<button id="btn-pdf" class="btn-sm">Descargar PDF</button>
+
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+<script>
+document.getElementById('btn-pdf').onclick=()=>{
+  html2pdf().set({
+  margin:1,
+  filename:'{{ post.title|replace(" ","_") }}.pdf',
+  image:{ type:'jpeg', quality:0.98 },
+  html2canvas:{ scale:2 },
+  pagebreak:{ mode:['avoid-all','css','legacy'] }
+}).from(document.querySelector('.markdown-content'))
+ .toPdf()
+ .get('pdf').then(pdf=>{
+    const logo = new Image();
+    logo.src = "{{ url_for('static',filename='ep_logo.png') }}";
+    pdf.insertImage(logo, 'PNG', 15, 15, 30, 30);   // ✔ logo arriba-izq
+ }).save();
+
+};
+</script>
+
+  </article>
+  <hr>
+<h4>Comentarios</h4>
+<ul id="comment-list">
+  {% for c in post.comments %}
+    {% include "comment_item.html" with context %}
+  {% endfor %}
+</ul>
+
+<form id="form-comment" style="margin-top:1rem">
+  <textarea name="content" rows="3" style="width:100%;border:1px solid #ccc;border-radius:4px"></textarea>
+  <button class="btn-explorar" style="margin-top:.5rem">Enviar</button>
+</form>
+<script>
+document.getElementById("form-comment").onsubmit=async e=>{
+  e.preventDefault();
+  const fd=new FormData(e.target);
+  const res=await fetch("/blog/{{ post.id }}/comment",{method:"POST",body:fd});
+  if(res.ok){
+     document.getElementById("comment-list")
+       .insertAdjacentHTML("beforeend",await res.text());
+     e.target.reset();
+  }
+};
+</script>
+
+  <!-- TOC SIDEBAR pegado -->
+  <aside class="sidebar toc">
+    <h4>Contenido</h4>
+    <ul>
+      {% for item in toc %}
+        <li class="toc-level-{{ item.level }}"><a href="#{{ item.anchor }}">{{ item.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='main.js') }}"></script>
+{% endblock %}

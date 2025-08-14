@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Blog | EP Datos{% endblock %}
+{% block content %}
+
+<div style="display:flex;gap:2rem">
+  <!-- MAIN -->
+  <div style="flex:3">
+    <h2 style="margin:0 0 1rem">Blog</h2>
+    <a href="{{ url_for('blog_form') }}" class="btn-explorar" style="margin-bottom:1.5rem">+ Nueva entrada</a>
+
+    {# contador global usando namespace #}
+    {% set ns = namespace(idx=total_posts) %}
+    {% for mes in months %}
+      <h3 class="month-header">{{ mes.label }}</h3>
+
+      {% for p in mes["items"]|reverse %}         {# recorremos del +viejo al +nuevo #}
+      <div class="card-blog">
+        <h3>#{{ ns.idx }} {{ p.title }}</h3>
+        {% set ns.idx = ns.idx - 1 %}
+
+          <p class="meta">
+            <b>{{ p.author_email }}</b> ·
+            {{ p.created_at.strftime("%d %b %Y") }} ·
+            {{ p.views }} vistas · {{ p.likes }} ❤️
+          </p>
+          <p>{{ p.content|markdown|striptags|truncate(200) }}</p>
+          <a class="more" href="{{ url_for('blog_detail', post_id=p.id) }}">Leer más →</a>
+          
+            
+        </div>
+      {% endfor %}
+    {% endfor %}
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <h4 style="margin-top:0">Archivo</h4>
+    <ul>
+      {% for mes in months %}
+        <li>
+          <a href="{{ url_for('blog_list') }}?month={{ mes.key }}"
+             class="{{ 'active' if mes.key==month_selected else '' }}">{{ mes.label }}</a>
+          ({{ mes["items"]|length }})
+        </li>
+      {% endfor %}
+    </ul>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,6 @@
+<li>
+    <b>{{ c.author_email }}</b>
+    <small>{{ c.created_at.strftime("%d-%m %H:%M") }}</small><br>
+    {{ c.content|markdown }}
+  </li>
+  

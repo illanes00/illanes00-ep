@@ -1,0 +1,148 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+from __future__ import annotations
+import re, json
+from pathlib import Path
+from collections import defaultdict
+import pandas as pd
+import pyreadstat
+
+HERE = Path(__file__).resolve().parent
+DATA = (HERE / "data") if (HERE / "data").exists() else (HERE / "../data")
+DATA = DATA.resolve()
+RAW_ENUSC = DATA / "raw" / "ENUSC"
+OUT_JSON  = DATA / "codebook_enusc.json"
+OUT_XLSX  = DATA / "codebook_enusc.xlsx"
+
+WEIGHTS_BY_YEAR = {
+    **{y: {"persona":"fact_pers_2008_2019","hogar":"fact_hog_2008_2019","estrato":"varstrat","conglomerado":"conglomerado"} for y in range(2008,2019)},
+    **{y: {"persona":"fact_pers_2019_2022","hogar":"fact_hog_2019_2022","estrato":"varstrat","conglomerado":"conglomerado"} for y in range(2019,2023)},
+    2023: {"persona":"Fact_Pers_Reg","hogar":"Fact_Hog_Reg","estrato":"VarStrat","conglomerado":"Conglomerado"},
+    2024: {"persona":"Fact_Pers_Reg","hogar":"Fact_Hog_Reg","estrato":"VarStrat","conglomerado":"Conglomerado"},
+}
+
+CANON = {"año":"ANIO","anio":"ANIO","year":"ANIO","sexo":"SEXO","edad":"EDAD","region":"REGION","region16":"REGION16","kish":"KISH",
+         "varstrat":"VARSTRAT","conglomerado":"CONGLOMERADO","va_dc":"VA_DC","vp_dc":"VP_DC","rvi":"RVI","rps":"RPS","rfv":"RFV","hur":"HUR","les":"LES","rva_dc":"RVA_DC"}
+def canonize(v:str)->str: return CANON.get(v.strip().lower(), v.strip().upper())
+
+def guess_unit(n:str)->str|None:
+    u=n.upper()
+    if u in {"VA_DC","RVA_DC","HUR"}: return "Hogar"
+    if u in {"VP_DC","RVI","RPS","RFV","LES"} or u.startswith("RPH_"): return "Persona"
+    if u in {"REGION","REGION16"}: return "Hogar"
+    return None
+def guess_role(n:str)->str|None:
+    u=n.upper()
+    if u in {"VA_DC","VP_DC","RVI","RPS","RFV","LES","HUR","RVA_DC"}: return "dependiente"
+    if u in {"SEXO","EDAD","REGION","REGION16"} or u.startswith("RPH_"): return "independiente"
+    if u=="KISH": return "filtro"
+    return None
+
+def _to_int(k):
+    if isinstance(k,(int,float)): 
+        try: return int(k)
+        except: return None
+    if isinstance(k,str) and re.fullmatch(r"-?\d+(\.0+)?", k.strip()):
+        return int(float(k))
+    return None
+
+def guess_scale(n:str, values:dict|None)->str|None:
+    if not values: return None
+    nums=[_to_int(k) for k in values.keys()]
+    nums=[x for x in nums if x is not None]
+    # binaria si TODOS los códigos son 0/1 (ignorando strings no numéricos)
+    if nums and set(nums).issubset({0,1}) and len(nums)>=1:
+        return "binaria"
+    if nums:
+        uniq=sorted(set(nums))
+        if uniq[0]==1 and uniq[-1]==len(uniq) and len(uniq)==uniq[-1]:
+            joined=" ".join(str(values[k]) for k in values)
+            if any(w in joined.lower() for w in ["menos","más","mas","mayor","menor","alta","baja","siempre","nunca","frecu"]):
+                return "categórica ordinal"
+            return "categórica nominal"
+    return "categórica nominal"
+
+def find_sav_files()->dict[int,Path]:
+    out={}
+    for p in RAW_ENUSC.glob("*.sav"):
+        m=re.search(r"(20\d{2})", p.name)
+        if m: out[int(m.group(1))]=p
+    return dict(sorted(out.items()))
+
+def read_labels_metadata(sav_path:Path):
+    _, meta = pyreadstat.read_sav(str(sav_path), apply_value_formats=False, metadataonly=True)
+    cols = [canonize(c) for c in meta.column_names or []]
+    var_labels = {canonize(k): v for k,v in (meta.variable_to_label or {}).items()}
+    if getattr(meta,"variable_value_labels",None):
+        vvl = {canonize(var): lab for var, lab in meta.variable_value_labels.items()}
+        return cols, var_labels, vvl
+    v2set = getattr(meta,"variable_to_value_labels",{}) or {}
+    sets  = meta.value_labels or {}
+    per_var={}
+    for var,setname in v2set.items():
+        labmap = sets.get(setname) or {}
+        if labmap: per_var[canonize(var)] = dict(labmap)
+    return cols, var_labels, per_var
+
+def main():
+    RAW_ENUSC.mkdir(parents=True, exist_ok=True)
+    files=find_sav_files()
+    if not files: raise SystemExit(f"[ERROR] No encontré .sav en {RAW_ENUSC}")
+
+    years_by_var=defaultdict(set); label_by_var={}; values_by_var=defaultdict(dict)
+
+    for year,path in files.items():
+        print(f"[INFO] {year} -> {path.name}")
+        try:
+            cols, varlabels, vallabels = read_labels_metadata(path)
+        except Exception as e:
+            print(f"[WARN] {year} no se pudo leer metadata: {e}"); continue
+        for v in cols:
+            years_by_var[v].add(year)
+            lab = varlabels.get(v, "") or label_by_var.get(v, "")
+            label_by_var[v]=lab
+            if v in vallabels and isinstance(vallabels[v], dict):
+                for k, txt in vallabels[v].items():
+                    values_by_var[v].setdefault(k, txt)
+
+    rows=[]; cats=[]
+    for v, years in sorted(years_by_var.items(), key=lambda kv: kv[0]):
+        label = label_by_var.get(v,""); values = values_by_var.get(v) or None
+        unidad=guess_unit(v) or None; rol=guess_role(v) or None; tipo=guess_scale(v, values) or None
+
+        pesos={}
+        for y in sorted(years):
+            meta=WEIGHTS_BY_YEAR.get(y, {})
+            if unidad=="Persona":
+                pesos[str(y)]={"peso":meta.get("persona"),"estrato":meta.get("estrato"),"conglomerado":meta.get("conglomerado")}
+            elif unidad=="Hogar":
+                pesos[str(y)]={"peso":meta.get("hogar"),"estrato":meta.get("estrato"),"conglomerado":meta.get("conglomerado")}
+            else:
+                pesos[str(y)]={"peso_persona":meta.get("persona"),"peso_hogar":meta.get("hogar"),
+                               "estrato":meta.get("estrato"),"conglomerado":meta.get("conglomerado")}
+
+        miss = [k for k in (85,88,96,98,99) if values and k in values] or None
+
+        row={"var":v,"etiqueta":label,"unidad_analisis":unidad,"rol_sugerido":rol,"tipo_escala":tipo,
+             "years":sorted(list(years)),"peso_recomendado_por_anio":pesos,"codigos_perdidos":miss,"categorias":None}
+        if values:
+            cats_sorted = sorted(values.items(), key=lambda kv: (isinstance(kv[0], str), str(kv[0])))
+            row["categorias"]=[{"codigo":(_to_int(k) if _to_int(k) is not None else k),"etiqueta":str(vl)} for k,vl in cats_sorted]
+            for k,vl in cats_sorted:
+                cats.append({"variable":v,"codigo":(_to_int(k) if _to_int(k) is not None else k),"etiqueta":str(vl)})
+        rows.append(row)
+
+    OUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    with open(OUT_JSON,"w",encoding="utf-8") as f:
+        json.dump({"dataset":"ENUSC","version":"1.2","rows":rows}, f, ensure_ascii=False, indent=2)
+    print(f"[OK] JSON  → {OUT_JSON}")
+
+    df_vars=pd.DataFrame(rows)
+    df_cats=pd.DataFrame(cats) if cats else pd.DataFrame(columns=["variable","codigo","etiqueta"])
+    with pd.ExcelWriter(OUT_XLSX, engine="xlsxwriter", engine_kwargs={"options":{"strings_to_urls": False}}) as xw:
+        df_vars[["var","etiqueta","unidad_analisis","rol_sugerido","tipo_escala","years","codigos_perdidos","peso_recomendado_por_anio"]].to_excel(xw, sheet_name="variables", index=False)
+        df_cats.to_excel(xw, sheet_name="categorias", index=False)
+    print(f"[OK] Excel → {OUT_XLSX}")
+
+if __name__=="__main__":
+    main()

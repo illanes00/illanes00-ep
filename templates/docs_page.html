@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}{{ current }}{% endblock %}
+
+{% block content %}
+<div style="display:flex;gap:2rem">
+  <aside class="sidebar" style="flex:1">
+    <h4 style="margin-top:0">Docs</h4>
+    <ul>
+      {% for f in files %}
+        <li><a href="{{ url_for('docs_page', name=f) }}"
+               class="{{ 'active' if f==current else '' }}">{{ f }}</a></li>
+      {% endfor %}
+    </ul>
+  </aside>
+
+  <article style="flex:3" class="markdown-content">
+    {{ html|safe }}
+  </article>
+</div>
+{% endblock %}

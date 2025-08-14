@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Gasto Público – Seguridad (DIPRES){% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="h4 fw-bold mb-3">Visualizaciones</h2>
+
+  <div id="tabs" class="mb-3" style="display:flex;gap:.5rem;flex-wrap:wrap">
+    <button class="btn btn-primary" data-tab="dipres">DIPRES</button>
+    <button class="btn btn-secondary" data-tab="enusc">ENUSC</button>
+    <button class="btn btn-secondary" data-tab="cead">CEAD</button>
+  </div>
+
+  <section id="tab-dipres">
+
+  <div class="row g-3 align-items-end mb-3">
+    <div class="col-auto">
+      <label class="form-label" for="sel-ds">Dataset:</label>
+      <select id="sel-ds" class="form-select">
+        <option value="viz_sp_pct_pib_incl_ps.json">Gasto %PIB (incl. PS)</option>
+        <option value="viz_sp_pct_pib_excl_ps.json">Gasto %PIB (excl. PS)</option>
+        <option value="viz_sp_pct_gt_incl_ps.json">% del Gasto Total (incl. PS)</option>
+        <option value="viz_sp_pct_gt_excl_ps.json">% del Gasto Total (excl. PS)</option>
+        <option value="viz_sp_pesos22_excl_ps.json">Pesos 2024 (excl. PS)</option>
+        <option value="viz_sp_subsec_pct_pib.json">Subsectores % del PIB</option>
+        <option value="viz_sp_subsec_pct_gt_sp.json">Subsectores % del gasto en Seguridad</option>
+        <option value="viz_sp_subsec_pesos22.json">Subsectores Pesos 2024</option>
+        <option value="viz_sp_inst_pct_pib.json">Instituciones – % del PIB</option>
+        <option value="viz_sp_inst_pct_gt_sp.json">Instituciones – % del gasto en Seguridad</option>
+        <option value="viz_sp_inst_pesos22.json">Instituciones – Pesos 2024</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button id="btn-plot" class="btn btn-primary">Graficar</button>
+    </div>
+  </div>
+
+  <div id="plot" style="width:100%;height:75vh;min-height:520px"></div>
+  <div id="meta" class="text-muted small mt-2"></div>
+</div>
+
+  </section>
+  <section id="tab-enusc" style="display:none">
+    <div class="alert alert-info">ENUSC: aquí enganchamos luego un selector simple (p. ej., victimización anual), usando /v1/enusc o json exportado.</div>
+  </section>
+  <section id="tab-cead" style="display:none">
+  <div class="row g-3 align-items-end mb-3">
+    <div class="col-auto">
+      <label class="form-label" for="sel-cead">Serie:</label>
+      <select id="sel-cead" class="form-select">
+        <option value="viz_cead_total.json">Total anual (todos los delitos)</option>
+        <option value="viz_cead_top.json">Top 10 delitos (último año)</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button id="btn-plot-cead" class="btn btn-secondary">Graficar CEAD</button>
+    </div>
+  </div>
+  <div id="plot-cead" style="width:100%;height:70vh;min-height:480px"></div>
+  <div id="meta-cead" class="text-muted small mt-2"></div>
+</section>
+  
+
+<!-- Plotly + script propio embebido para que SIEMPRE cargue -->
+<script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+{% block scripts_extra %}
+<script src="/web/static/viz_dipres.js"></script>
+<script src="/web/static/viz_cead.js"></script>
+{% endblock %}
+
+{% endblock %}

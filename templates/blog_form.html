@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{% if post %}Editar{% else %}Nueva{% endif %} entrada{% endblock %}
+
+{% block content %}
+<h2 style="margin-bottom:1rem">{% if post %}Editar{% else %}Crear{% endif %} entrada</h2>
+
+<form id="post-form" method="post">
+  <label style="display:block;margin-bottom:.75rem">
+    <input type="text" name="title" placeholder="Título de la entrada"
+       value="{{ post.title if post else '' }}"
+       style="width:100%;padding:.5rem;font-size:1.1rem;
+              border:none;border-bottom:2px solid var(--turquesa);
+              background:transparent;outline:none;">
+  </label>
+  <label style="display:block;margin-bottom:.75rem">
+    <input name="tag" placeholder="Proyecto / etiqueta"
+           value="{{ post.tag if post else '' }}"
+           style="width:100%;padding:.5rem;
+                  border:none;border-bottom:2px solid var(--turquesa);background:transparent">
+  </label>
+  <label style="display:block;margin-bottom:.5rem">Contenido (Markdown)</label>
+  <textarea id="md-editor" name="content" rows="15"
+            style="display:none">{{ post.content if post else '' }}</textarea>
+
+  <button class="btn-explorar" style="margin-top:1rem">
+     {% if post %}Guardar{% else %}Crear{% endif %}
+  </button>
+</form>
+{% endblock %}
+
+{% block extra_scripts %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+  const easy = new EasyMDE({
+    element: document.getElementById("md-editor"),
+    spellChecker: false,
+    autoDownloadFontAwesome:false,
+    toolbar:["bold","italic","heading","quote","unordered-list","ordered-list","link","image","preview"],
+    autoDownloadFontAwesome:true
+  });
+    /* --- IMPORTAR DESDE GOOGLE DOCS --- */
+  const btnImp = document.createElement("button");
+  btnImp.type  = "button";
+  btnImp.textContent = "Importar desde Google Docs";
+  btnImp.className   = "btn-explorar";
+  document.getElementById("post-form").prepend(btnImp);
+  btnImp.onclick = async ()=>{
+     const url = prompt("Pega la URL pública del doc:");
+     if(!url) return;
+     try{
+        const fileId = url.match(/[-\w]{25,}/)[0];
+        const exportUrl =
+           `https://docs.google.com/document/d/${fileId}/export?format=md`;
+        const md = await (await fetch(exportUrl)).text();
+        easy.value(md);
+     }catch(e){ alert("URL no válida o el doc no es público"); }
+  };
+  document.getElementById("post-form").addEventListener("submit",ev=>{
+    if(easy.value().trim()===""){
+      alert("El contenido no puede estar vacío"); ev.preventDefault();
+    }
+  });
+</script>
+{% endblock %}

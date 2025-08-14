@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Visual Builder{% endblock %}
+{% block content %}
+
+<h2 style="margin-bottom:1rem">Construye tu gráfico</h2>
+
+<div style="display:flex;gap:2rem;flex-wrap:wrap">
+
+  <div style="flex:1;min-width:220px">
+    <label>Dataset
+      <select id="sel-ds"></select>
+    </label><br><br>
+
+    <label>Eje X
+      <select id="sel-x"></select>
+    </label><br><br>
+
+    <label>Eje Y
+      <select id="sel-y"></select>
+    </label><br><br>
+
+    <label>Tipo
+      <select id="sel-type">
+        <option value="bar">Barra</option>
+        <option value="line">Línea</option>
+        <option value="scatter">Puntos</option>
+      </select>
+    </label><br><br>
+
+    <button id="btn-plot" class="btn-explorar">Actualizar</button>
+    <button id="btn-dl"   class="btn-explorar" style="background:#6A3F95">Descargar PNG</button>
+  </div>
+
+  <div style="flex:3;min-width:300px">
+    <canvas id="viz" style="max-width:100%;height:460px"></canvas>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ---------- catálogo de datasets disponibles ----------
+const DATASETS = {
+  enusc:{ label:"ENUSC", endpoint:"/v1/enusc", numeric:["rvi","rps","rfv","edad"], categorical:["region","sexo","año"] }
+  // aquí irás añadiendo más { id:{label,endpoint,numeric,categorical } }
+};
+
+// ---------- helpers ----------
+function fill(sel, opts){
+  sel.innerHTML = opts.map(o=>`<option value="${o}">${o}</option>`).join("");
+}
+
+const dsSel = document.getElementById("sel-ds");
+fill(dsSel, Object.keys(DATASETS));
+
+// cuando cambia dataset -> recargo opciones de columnas
+dsSel.onchange = ()=>{
+  const ds = DATASETS[dsSel.value];
+  fill(document.getElementById("sel-x"), [...ds.categorical]);
+  fill(document.getElementById("sel-y"), [...ds.numeric]);
+};
+dsSel.value="enusc"; dsSel.onchange();      // inicial
+
+// gráfico vacío
+const ctx = document.getElementById("viz");
+let chart = new Chart(ctx,{type:'bar',data:{labels:[],datasets:[{data:[]}]} ,options:{responsive:true}});
+
+// PLOT
+document.getElementById("btn-plot").onclick = async ()=>{
+  const ds = DATASETS[dsSel.value];
+  const xCol = xSel.value,   yCol = ySel.value;
+  const url = ds.endpoint+"?limit=10000&human=1";
+  const data = await (await fetch(url)).json();
+
+  // agregación simple: y=sum(yCol) group by xCol
+  const agg={};
+  data.forEach(r=>{
+    const k=r[xCol]; agg[k]=(agg[k]||0)+Number(r[yCol]||0);
+  });
+  const labels=Object.keys(agg).sort();
+  const values=labels.map(k=>agg[k]);
+
+  chart.destroy();
+  chart = new Chart(ctx,{
+    type:document.getElementById("sel-type").value,
+    data:{labels,datasets:[{label:yCol,data:values}]},
+    options:{responsive:true,plugins:{legend:{display:false}}}
+  });
+};
+
+// DOWNLOAD
+document.getElementById("btn-dl").onclick = ()=>{
+  const a=document.createElement("a");
+  a.href=chart.toBase64Image();
+  a.download="grafico.png";
+  a.click();
+};
+const xSel = document.getElementById("sel-x");
+const ySel = document.getElementById("sel-y");
+
+</script>
+{% endblock %}

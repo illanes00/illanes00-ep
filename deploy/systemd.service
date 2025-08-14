@@ -1,0 +1,18 @@
+[Unit]
+Description=illanes00-ep service (run.py)
+After=network.target
+
+[Service]
+User=illanes00-ep
+Group=www-data
+WorkingDirectory=/srv/projects/illanes00-ep
+EnvironmentFile=/srv/projects/illanes00-ep/.env
+ExecStart=/srv/projects/illanes00-ep/venv/bin/python /srv/projects/illanes00-ep/run.py
+Restart=always
+RestartSec=5
+TimeoutStartSec=30
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal de Datos | Espacio Público</title>
+  <!-- Fuente Montserrat -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <!-- Tu CSS personalizado -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='ep.css') }}">
+</head>
+
+<body>
+  <!-- HEADER -->
+  <header>
+    <div class="container nav">
+      <div class="logo">Espacio Público – Portal de Datos</div>
+      <ul class="nav-menu">
+        <li><a href="https://espaciopublico.cl" target="_blank">Volver a Espacio Público</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <h1>Portal de Datos Abiertos</h1>
+      <p>Descarga y consulta información pública: estadísticas, indicadores y datasets gestionados por Espacio Público.</p>
+      <a href="{{ url_for('blog_list') }}" class="btn-explorar">Ir al Dashboard</a>
+    </div>
+  </section>
+
+  <!-- FUNCIONALIDADES -->
+  <section class="features container">
+    <h2 style="text-align: center; font-size: 2rem; margin-bottom: 2rem; color: var(--turquesa);">
+      ¿Qué ofrece este portal?
+    </h2>
+    <div class="features-grid">
+      <div class="card">
+        <h3>Descarga de Datasets</h3>
+        <p>Accede a archivos CSV, JSON y más sobre temas de políticas públicas, transporte, salud y medio ambiente.</p>
+      </div>
+      <div class="card">
+        <h3>API Pública</h3>
+        <p>Consulta datos en tiempo real mediante nuestra API REST para integrar en tus proyectos.</p>
+      </div>
+      <div class="card">
+        <h3>Documentación</h3>
+        <p>Guías rápidas, ejemplos de consultas y todo el detalle para aprovechar al máximo el portal de datos.</p>
+      </div>
+      <div class="card">
+        <h3>Visualizaciones</h3>
+        <p>Gráficos interactivos que facilitan la exploración sin necesidad de programar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container footer-grid">
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <ul>
+          <li>Email: <a href="mailto:martin.illanes@espaciopublico.cl">martin.illanes@espaciopublico.cl</a></li>
+          <li>Dirección: Orrego Luco 087, Piso 3, Providencia</li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Enlaces</h4>
+        <ul>
+          <li><a href="https://espaciopublico.cl" target="_blank">Espacio Público</a></li>
+          <li><a href="{{ url_for('home') }}">EP Datos</a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Política de Privacidad</a></li>
+          <li><a href="#">Términos de Uso</a></li>
+          <li><a href="#">Licencia de Datos</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      © 2025 Espacio Público. Todos los derechos reservados.
+    </div>
+  </footer>
+</body>
+</html>
